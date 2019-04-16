@@ -35,7 +35,7 @@ class downloader(object):
             while page_num_begin <= page_num_end:
                 self.page_urls.append(self.page_server + str(page_num_begin))
                 page_num_begin = page_num_begin + 1
-        # print(self.page_urls)
+        print(self.page_urls)
 
     """
      函数说明:获取文章标题及下载链接
@@ -59,14 +59,16 @@ class downloader(object):
             ul = div1_bf.find('ul', class_='headline-list headline-list--ordered')
             headlisttitle_bf = BeautifulSoup(str(ul), 'html.parser')
             headlisttitle = headlisttitle_bf.find_all('h4')  # 文章列表标题
-
+            # print(headlinetitle[0].text)
             if len(headlisttitle)| len(headlinetitle) > 0:   # 判断是否存在文章标题（有标题必然存在文章内容），不存在直接结束
                 titlelist.append(headlinetitle[0].text.replace('\n', ''))
+                # print(titlelist)
                 for each in headlisttitle:
                     titlelist.append(each.text)
+
                 # 获取文章链接
                 headlinelink = div1_bf.find_all('a', class_='card__faux-block-link')
-                # print(server+headlinelink[0].get('href'))
+                # print(self.server + headlinelink[0].get('href'))
                 parserlink = div1_bf.find_all('div', class_='media-object-section')
                 linklist_bf = BeautifulSoup(str(parserlink), 'html.parser')
                 linklist = linklist_bf.find_all('a')
@@ -79,18 +81,19 @@ class downloader(object):
                     matchObj1 = links[each].find("comments")  # 去除comments链接
                     if matchObj1 < 0:
                         linksnew.append(links[each])
-                # print(linksnew)
+
                 linksnew1 = []
                 linksnew1.append(self.server + headlinelink[0].get('href'))
                 for each in range(len(linksnew)):
-                    pattern = re.compile(r'\d+')
-                    matchObj2 = pattern.findall(linksnew[each])  # 只获取含日期的链接
-                    if matchObj2:
+                    matchObj2 = linksnew[each].find("autor")  # 去除autor链接
+                    if matchObj2 < 0:
                         linksnew1.append(self.server + linksnew[each])
+
                 # 整合输出标题及文章链接
+                # print(linksnew1, len(linksnew1),len(titlelist))
                 for each in range(len(linksnew1)):
                     titlelink.append(titlelist[each] + ' ' + linksnew1[each])
-                    # print(titlelink[each])
+                # print(titlelink)
                 for each in range(len(titlelink)):
                     titlelistall.append(titlelist[each])
                     linksall.append(linksnew1[each])
@@ -181,7 +184,7 @@ if  __name__ == "__main__":
             w.writelines(str(texts) + '\n')
         w.close()
 
-        WordsList = open('WordList.txt', 'r').read()  # 读取需匹配的单词表
+        WordsList = open('WordList.txt', 'r',encoding='utf-8').read()  # 读取需匹配的单词表
         WordsList = re.split('\n', WordsList)  # 分割换行符以元组形式存储备用
 
         # 统计给定单词表的出现次数
