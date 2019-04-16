@@ -59,13 +59,10 @@ class downloader(object):
             ul = div1_bf.find('ul', class_='headline-list headline-list--ordered')
             headlisttitle_bf = BeautifulSoup(str(ul), 'html.parser')
             headlisttitle = headlisttitle_bf.find_all('h4')  # 文章列表标题
-            # print(headlinetitle[0].text)
             if len(headlisttitle)| len(headlinetitle) > 0:   # 判断是否存在文章标题（有标题必然存在文章内容），不存在直接结束
-                titlelist.append(headlinetitle[0].text.replace('\n', ''))
-                # print(titlelist)
+                titlelist.append(re.sub('\n|\r', '', headlinetitle[0].text))
                 for each in headlisttitle:
-                    titlelist.append(each.text)
-
+                    titlelist.append(re.sub('\n|\r', '', each.text))
                 # 获取文章链接
                 headlinelink = div1_bf.find_all('a', class_='card__faux-block-link')
                 # print(self.server + headlinelink[0].get('href'))
@@ -123,7 +120,7 @@ class downloader(object):
         # 问题：怎么把元组多个元素组成一个
         contents = []
         for each in range(len(p)):
-            contents.append(p[each].text)
+            contents.append(re.sub('\n|\r', '', p[each].text))
             # print(contents)
             texts = ''.join(contents)   # 元组中多个元素组合
             # texts = line.encode('GBK', 'ignore').decode('GBK', 'ignore')
