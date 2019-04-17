@@ -2,6 +2,8 @@
 from bs4 import BeautifulSoup
 import requests
 import re
+import time
+
 
 class downloader(object):
 
@@ -17,6 +19,7 @@ class downloader(object):
     """
     函数说明:获取页面
     """
+
     def get_page_url(self):
         # 获取页面链接
         page_num_begin = int(input(("Enter page_num_begin: ")))   # 输入爬取页面起始页数
@@ -43,8 +46,8 @@ class downloader(object):
 
     def get_download_url(self):
         titlelinkall = []
-        titlelistall =[]
-        linksall =[]
+        titlelistall = []
+        linksall = []
         for each in range(len(self.page_urls)):
             titlelink = []
             # print(self.page_urls[each])
@@ -56,17 +59,22 @@ class downloader(object):
             titlelist = []
             div1_bf = BeautifulSoup(str(div), 'html.parser')
             headlinetitle = div1_bf.find_all('h3')  # 头条文章标题
-            ul = div1_bf.find('ul', class_='headline-list headline-list--ordered')
+            ul = div1_bf.find(
+                'ul', class_='headline-list headline-list--ordered')
             headlisttitle_bf = BeautifulSoup(str(ul), 'html.parser')
             headlisttitle = headlisttitle_bf.find_all('h4')  # 文章列表标题
-            if len(headlisttitle)| len(headlinetitle) > 0:   # 判断是否存在文章标题（有标题必然存在文章内容），不存在直接结束
+            req.close()
+            if len(headlisttitle) | len(
+                    headlinetitle) > 0:   # 判断是否存在文章标题（有标题必然存在文章内容），不存在直接结束
                 titlelist.append(re.sub('\n|\r', '', headlinetitle[0].text))
                 for each in headlisttitle:
                     titlelist.append(re.sub('\n|\r', '', each.text))
                 # 获取文章链接
-                headlinelink = div1_bf.find_all('a', class_='card__faux-block-link')
+                headlinelink = div1_bf.find_all(
+                    'a', class_='card__faux-block-link')
                 # print(self.server + headlinelink[0].get('href'))
-                parserlink = div1_bf.find_all('div', class_='media-object-section')
+                parserlink = div1_bf.find_all(
+                    'div', class_='media-object-section')
                 linklist_bf = BeautifulSoup(str(parserlink), 'html.parser')
                 linklist = linklist_bf.find_all('a')
                 links = []
@@ -95,6 +103,7 @@ class downloader(object):
                     titlelistall.append(titlelist[each])
                     linksall.append(linksnew1[each])
                     titlelinkall.append(titlelink[each])
+            time.sleep(1)
         self.nums = len(titlelinkall)  # 并统计章节数
         for each in range(len(titlelinkall)):
             self.names.append(titlelistall[each])
@@ -110,7 +119,7 @@ class downloader(object):
         texts - 章节内容(string)
     """
 
-    def get_contents (self, target):
+    def get_contents(self, target):
         req = requests.get(url=target)
         html = req.text
         div_bf = BeautifulSoup(html, 'html.parser')
@@ -120,7 +129,7 @@ class downloader(object):
         # 问题：怎么把元组多个元素组成一个
         contents = []
         for each in range(len(p)):
-            contents.append(re.sub('\n|\r', '', p[each].text))
+            contents.append(p[each].text)
             # print(contents)
             texts = ''.join(contents)   # 元组中多个元素组合
             # texts = line.encode('GBK', 'ignore').decode('GBK', 'ignore')
@@ -134,26 +143,39 @@ class downloader(object):
         text - 章节内容(string)
     """
 
-    def writer (self, name, path, text):
+    def writer(self, name, path, text):
         write_flag = True
         with open(path, 'a', encoding='utf-8') as f:
             f.write(str(name) + '\n')
             f.writelines(text)
             f.write('\n\n')
 
-if  __name__ == "__main__":
+
+if __name__ == "__main__":
+    start = time.time()
     dl = downloader()
     dl.get_page_url()
     dl.get_download_url()
-    print('文章开始下载')
     print('共计文章数目：', dl.nums)
+    print('文章开始下载\n下载进度')
     if dl.nums > 0:   # 判断文章是否存在，也即判断是否可以写入文本生成文件
+        start = time.perf_counter()
         for i in range(dl.nums):
             dl.writer(dl.names[i], 'Paper.txt', dl.get_contents(dl.urls[i]))
+            p = round((i + 1) * 100 / dl.nums, 2)
+            duration = round(time.perf_counter() - start, 2)
+            remaining = round(duration * 100 /(0.0001+p) - duration, 2)   # 加0.0001是为了避免除数为0的情况
+            print(
+                '\r',
+                "文章数：{0}，进度:{1}%，已耗时:{2}s，预计剩余时间:{3}s".format(
+                    i+1,
+                    p,
+                    duration,
+                    remaining),
+                end='')
             # print(dl.names[i], dl.get_contents(dl.urls[i]))
-            # sys.stdout.write("  已下载:%.3f%%" % float(i / dl.nums) + '\r')
-            # sys.stdout.flush()
-        print("文章下载完成")
+            time.sleep(0.5)
+        print("\n文章下载完成")
         # 计算单词数
         contents = open('Paper.txt', 'r', encoding='UTF-8').read()
         contents = re.sub(r'[^\w\s]', ' ', contents)  # 去除标点符号
@@ -171,7 +193,10 @@ if  __name__ == "__main__":
             map[word] = map[word] + 1 \
                 if word in map.keys() \
                 else 1
-        map = sorted(map.items(), key=lambda item: item[1], reverse=True)  # 倒序，注意这里map变为列表
+        map = sorted(
+            map.items(),
+            key=lambda item: item[1],
+            reverse=True)  # 倒序，注意这里map变为列表
         words_num = len(map)
         w.writelines('单词种类：%s\n' % words_num)
         print("单词种类:%s" % words_num)
@@ -181,17 +206,23 @@ if  __name__ == "__main__":
             w.writelines(str(texts) + '\n')
         w.close()
 
-        WordsList = open('WordList.txt', 'r',encoding='utf-8').read()  # 读取需匹配的单词表
+        WordsList = open(
+            'WordList.txt',
+            'r',
+            encoding='utf-8').read()  # 读取需匹配的单词表
         WordsList = re.split('\n', WordsList)  # 分割换行符以元组形式存储备用
 
         # 统计给定单词表的出现次数
         f = open('result.txt', 'w', encoding='utf-8')
-        f.writelines("统计结果如下:\n文章数目：%s\n共计单词数：%s\n单词种类数：%s\n" % (dl.nums, Word_num, words_num))
+        f.writelines(
+            "统计结果如下:\n文章数目：%s\n共计单词数：%s\n单词种类数：%s\n" %
+            (dl.nums, Word_num, words_num))
         for each in range(len(WordsList)):  # 第一层是单词表的循环
             a = 0
             for line in range(Word_num):
                 Word = WordsList[each]
-                matchObj = re.fullmatch(Word, contents[line], re.M | re.I)  # 第二层是在下载的文本中每行匹配相应的单词,已忽略大小写
+                # 第二层是在下载的文本中每行匹配相应的单词,已忽略大小写
+                matchObj = re.fullmatch(Word, contents[line], re.M | re.I)
                 if matchObj:
                     a = a + 1  # 计数
             result = Word + ':' + str(a)
