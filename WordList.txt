@@ -1,0 +1,97 @@
+assembler
+samblar
+montar
+back-up
+backup
+cópia de segurança
+background
+pano de fundo
+formação de base
+bit
+break
+breque
+browser
+navegador
+buffer
+memória temporária
+memória-tampão
+bug
+falha
+byte
+chip
+chipe
+circuito integrado
+clear
+cookie
+download
+descarregar
+baixar
+driver
+e-book
+ebook
+livro eletrónico
+e-mail
+email
+correio electrónico
+e-zine
+ezine
+revista eletrónica
+extranet
+rede externa
+firewall
+barreira de segurança
+fortran
+freeware
+hardware
+equipamento físico
+high-tech
+alta-tecnologia
+kilobyte
+kilobit
+mail
+megabit
+correio electrónico
+endereço electrónico
+mainframe
+unidade central de processamento
+microchip
+chipe
+modem
+motherboard
+placa-mãe
+mouse
+rato
+net
+netsplit
+note-book
+notebook
+portátil
+off-line
+offline
+desligado
+fora de linha
+router
+encaminhador
+scanner
+digitalizador
+screensaver
+protetor de ecrã
+server
+servidor
+site
+sítio
+software
+upgrade
+promoção
+voice-mail
+voicemail
+caixa postal de voz
+web
+workstation
+estação de trabalho
+zip
+compressão de ficheiros
+fecho de correr
+videotape
+vídeo
+videogravador
